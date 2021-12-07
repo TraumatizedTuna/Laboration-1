@@ -38,7 +38,7 @@ class Location {
         action.interact();
     }
 }
-Location.neighborize = function (loc0, loc1) {
+Location.connect = function (loc0, loc1) {
     loc0.addNeighbors([loc1]);
     loc1.addNeighbors([loc0]);
 }

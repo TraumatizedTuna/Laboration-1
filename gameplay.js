@@ -10,9 +10,9 @@ function play() {
     let hyperspace = new Location('hyperspace');
     hyperspace.addNeighbors(locs);
 
-    Location.neighborize(locs.bedroom, locs.livingRoom);
-    Location.neighborize(locs.livingRoom, locs.bathroom);
-    Location.neighborize(locs.livingRoom, locs.kitchen);
+    Location.connect(locs.bedroom, locs.livingRoom);
+    Location.connect(locs.livingRoom, locs.bathroom);
+    Location.connect(locs.livingRoom, locs.kitchen);
 
     let items = {
         watch: new Item(
@@ -145,7 +145,7 @@ function play() {
         cloud: new Item('cloud', locs.heaven),
         demon: new Item('demon', locs.hell)
     };
-    if (Math.random() > 1 / 3) items.cat.moveRandom();
+    if (Math.random() > 1 / 4) items.cat.moveRandom();
 
 
     locs.bedroom.interact();
