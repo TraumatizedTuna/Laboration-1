@@ -1,21 +1,26 @@
 class Location {
     constructor(name) {
         this.name = name;
-        this.neighborhood = new Set();
+        this.neighbors = new Set();
         this.items = new Set();
         this.message = 'You are in ' + this.name;
     }
-    addNeighbor(neighbor) {
-        this.neighborhood.add(neighbor);
+    addNeighbors(neighbors) {
+        for(let i in neighbors){
+            this.neighbors.add(neighbors[i]);
+        }
     }
     addItem(item) {
         this.items.add(item);
+    }
+    removeItem(item){
+        this.items.delete(item);
     }
     interact() {
         alert(this.message);
         let actions = {};
         let options = '';
-        for (let loc of this.neighborhood) {
+        for (let loc of this.neighbors) {
             let command = 'Enter ' + loc.name;
             actions[command.toLowerCase().replaceAll(' ', '')] = loc;
             options += '\n' + command;
@@ -34,8 +39,8 @@ class Location {
     }
 }
 Location.neighborize = function (loc0, loc1) {
-    loc0.addNeighbor(loc1);
-    loc1.addNeighbor(loc0);
+    loc0.addNeighbors([loc1]);
+    loc1.addNeighbors([loc0]);
 }
 
 class Item {
@@ -45,9 +50,9 @@ class Item {
         this.command = command || 'Check out ';
         this.interact = interact || function(){alert('This is '+this.name); this.loc.interact()};
     }
-    move(to, from) {
-        if (from) {
-            from.removeItem(this)
+    move(to) {
+        if (this.loc) {
+            this.loc.removeItem(this)
         }
         to.addItem(this);
         this.loc = to;
