@@ -6,14 +6,14 @@ class Location {
         this.message = 'You are in ' + this.name;
     }
     addNeighbors(neighbors) {
-        for(let i in neighbors){
+        for (let i in neighbors) {
             this.neighbors.add(neighbors[i]);
         }
     }
     addItem(item) {
         this.items.add(item);
     }
-    removeItem(item){
+    removeItem(item) {
         this.items.delete(item);
     }
     interact() {
@@ -31,9 +31,9 @@ class Location {
             options += '\n' + command;
         }
         let action;
-        while(!action){
+        while (!action) {
             let userInput = prompt('Options:' + options);
-            action=actions[userInput.toLowerCase().replaceAll(' ', '')]
+            action = actions[userInput.toLowerCase().replaceAll(' ', '')]
         }
         action.interact();
     }
@@ -48,14 +48,20 @@ class Item {
         this.name = name;
         this.move(loc);
         this.command = command || 'Check out ';
-        this.interact = interact || function(){alert('This is '+this.name); this.loc.interact()};
+        this.interact = interact || function () { alert('This is ' + this.name); this.loc.interact() };
     }
-    move(to) {
+    move(destination) {
         if (this.loc) {
             this.loc.removeItem(this)
         }
-        to.addItem(this);
-        this.loc = to;
+        destination.addItem(this);
+        this.loc = destination;
+    }
+    moveRandom() {
+        let locs = Array.from(this.loc.neighbors);
+        if (locs.length) {
+            this.move(locs[Math.floor(Math.random() * locs.length)]);
+        }
     }
 
 }
