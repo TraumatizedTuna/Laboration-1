@@ -38,7 +38,7 @@ class Location {
      * this.message will be displayed to user, followed by all available commands.
      */
     interact() {
-        alert(this.message);
+        ui.setLoc(this.message);
         let actions = {};
         let options = '';
         for (let loc of this.neighbors) {
@@ -51,12 +51,17 @@ class Location {
             actions[command.toLowerCase().replaceAll(' ', '')] = item;
             options += '\n' + command;
         }
-        let action;
-        while (!action) {
-            let userInput = prompt('Options:' + options);
-            action = actions[userInput.toLowerCase().replaceAll(' ', '')]
-        }
-        action.interact();
+
+
+        ui.userInput(
+            'Options:' + options,
+            function (userInput, actions) {
+                let action = actions[userInput.toLowerCase().replaceAll(' ', '')]
+                action.interact();
+            },
+            actions
+        );
+
     }
 }
 /**
@@ -81,7 +86,15 @@ class Item {
         this.name = name;
         this.move(loc);
         this.command = command || 'Check out ';
-        this.interact = interact || function () { alert('This is ' + this.name); this.loc.interact() };
+        this.interact = interact || function () {
+            ui.userInput(
+                'This is ' + this.name,
+                function(userInput, loc){
+                    loc.interact()
+                },
+                this.loc
+            )
+        };
     }
     /**
      * Move this from this.loc to destination.

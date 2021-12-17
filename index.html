@@ -6,13 +6,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="ui.js"></script>
     <script src="classes.js"></script>
     <script src="gameplay.js"></script>
 </head>
 
 <body>
+    <div>
+        <div id="loc"></div>
+        <div id="info"></div>
+        <input type="text" id="user-input">
+    </div>
     <script>
-        window.onload=play();
+        window.onload=function(){
+            setupUi();
+            play();
+        }
     </script>
 </body>
 
