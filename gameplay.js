@@ -3,7 +3,7 @@ function play() {
         livingRoom: new Location('living room'),
         bedroom: new Location('bedroom'),
         bathroom: new Location('bathroom'),
-        kitchen: new Location('Kitchen'),
+        kitchen: new Location('kitchen'),
         heaven: new Location('heaven'),
         hell: new Location('hell')
     };
@@ -21,39 +21,61 @@ function play() {
             'Watch ',
             function () {
                 let date = new Date();
-                alert("It's " + date.getHours() + ':' + date.getMinutes());
-                this.loc.interact();
+                ui.userInput(
+                    "It's " + date.getHours() + ':' + date.getMinutes(),
+                    function (userInput, loc) {
+                        loc.interact();
+                    },
+                    this.loc
+                );
             }),
 
         teleporter: new Item('teleporter',
             locs.bathroom,
             'Use ',
             function () {
-                let password = prompt('Please enter password');
-                if (password === 'Do geese see God?') {
-                    if (confirm('Proceed into hyperspace? (Probability of fatal error: 2*10^-1)')) {
-                        if (Math.random() < .2) {
-                            //50/50 between heaven and hell
-                            if (Math.random() < .5) {
-                                locs.heaven.interact();
-                            }
-                            else {
-                                locs.hell.interact();
-                            }
+
+                ui.userInput(
+                    'Please enter password',
+                    function (password, loc) {
+
+                        if (password === 'Do geese see God?') {
+                            ui.userInput('Proceed into hyperspace? (Probability of fatal error: 2*10^-1)',
+                                function (userInput, loc) {
+                                    if (userInput.toLowerCase() === 'yes') {
+                                        if (Math.random() < .2) {
+                                            //50/50 between heaven and hell
+                                            if (Math.random() < .5) {
+                                                locs.heaven.interact();
+                                            }
+                                            else {
+                                                locs.hell.interact();
+                                            }
+                                        }
+                                        //If there's no fatal error, move on to hyperspace
+                                        else {
+                                            hyperspace.interact();
+                                        }
+                                    }
+                                    //If user does not wish to proceed into hyperspace, go back to loc
+                                    else {
+                                        loc.interact();
+                                    }
+                                },
+                                loc
+                            )
                         }
-                        //If there's no fatal error, move on to hyperspace
                         else {
-                            hyperspace.interact();
+                            ui.userInput(
+                                'Antimatter security system triggered.',
+                                function () {
+                                    locs.hell.interact();
+                                }
+                            );
                         }
-                    }
-                    else {
-                        this.loc.interact();
-                    }
-                }
-                else {
-                    alert('Antimatter security system triggered.');
-                    locs.hell.interact();
-                }
+                    },
+                    this.loc
+                );
 
             }
         ),
@@ -62,10 +84,15 @@ function play() {
             locs.livingRoom,
             'Pet ',
             function () {
-                alert('Successfully petted cat.');
-                let loc = this.loc;
-                this.moveRandom();
-                loc.interact();
+                ui.userInput(
+                    'Cat successfully petted.',
+                    function (userInput, cat) {
+                        let loc = cat.loc;
+                        cat.moveRandom();
+                        loc.interact();
+                    },
+                    this
+                );
             }
         ),
 
@@ -73,59 +100,103 @@ function play() {
             locs.livingRoom,
             'Talk to ',
             function () {
-                prompt('"Hey, my name is Bob, did you know that\'s a palindrome?"');
-                while (true) {
-                    let name = prompt('"What\'s your name?"').replace(' ', '').toLowerCase();
-                    if (name) {
-                        //You have to be more creative than that
-                        if (name === 'bob') {
-                            alert('"Yeah, right."');
-                        }
+                ui.userInput(
+                    'Bob: "Hey, my name is Bob, did you know that\'s a palindrome?"',
+                    function (userInput, bob) {
 
-                        //Bob knows the password to the teleporter
-                        else if ((name.includes('password') || name.includes('code')) && name.includes('teleport')) {
-                            alert('"Do geese see God?"');
-                        }
+                        let talkToBob = function (name, bob, talkToBob) {
+                            name.replace(' ', '').toLowerCase();
+                            if (name) {
+                                //You have to be more creative than that
+                                if (name === 'bob') {
+                                    ui.userInput('Bob: "Yeah, right."', talkToBob, bob, talkToBob);
+                                }
 
-                        //If your name is a palindrome Bob will be satisfied and leave you alone
-                        else if (name === name.split('').reverse().join('')) {
-                            alert('"Oh, cool, that\'s a palindrome, bye."');
-                            let loc = this.loc;
-                            this.moveRandom();
-                            loc.interact();
-                        }
-                        //If it isn't you'll have to try harder
-                        else {
-                            alert("That's not a palindrome though.");
-                            //One in five risk that Bob dies
-                            if (Math.random() < .2) {
-                                let loc = this.loc;
-                                //Bob doesn't seem like a nice guy
-                                this.move(locs.hell);
-                                alert('Bob was killed by the non-palindromity of your name.');
-                                loc.interact();
+                                //Bob knows the password to the teleporter
+                                else if ((name.includes('password') || name.includes('code')) && name.includes('teleport')) {
+                                    ui.userInput(
+                                        'Bob: "Do geese see God?"',
+                                        function (userInput, loc) {
+                                            loc.interact()
+                                        },
+                                        bob.loc
+                                    );
+                                }
+
+                                //If your name is a palindrome Bob will be satisfied and leave you alone
+                                else if (name === name.split('').reverse().join('')) {
+                                    ui.userInput(
+                                        'Bob: "Oh, cool, that\'s a palindrome, bye."',
+                                        function (userInput, bob) {
+                                            let loc = bob.loc;
+                                            bob.moveRandom();
+                                            loc.interact();
+                                        },
+                                        bob
+                                    );
+                                }
+                                //If it isn't you'll have to try harder
+                                else {
+                                    ui.userInput(
+                                        "Bob: That's not a palindrome though.",
+                                        function (userInput, bob) {
+                                            //One in five risk that Bob dies
+                                            if (Math.random() < .2) {
+                                                let loc = bob.loc;
+                                                //Bob doesn't seem like a nice guy
+                                                bob.move(locs.hell);
+                                                userInput('Bob was killed by the non-palindromity of your name.',
+                                                function(userInput, loc){
+                                                    loc.interact();
+                                                },
+                                                bob.loc
+                                                );
+                                                loc.interact();
+                                            }
+                                            else {
+                                                ui.userInput(
+                                                    'Bob: "What\'s your name?"',
+                                                    talkToBob,
+                                                    bob,
+                                                    talkToBob
+                                                );
+                                            }
+                                        },
+                                        bob
+                                    );
+                                }
                             }
                         }
-                    }
-                }
+                        ui.userInput(
+                            'Bob: "What\'s your name?"',
+                            talkToBob,
+                            bob,
+                            talkToBob
+                        );
+                    },
+                    this
+                );
             }
+
         ),
 
         god: new Item('God',
             locs.heaven,
-            'Talk to ',
-            function () {
-                while (prompt());
-                this.loc.interact();
-            }
+            'Talk to '
         ),
 
         satan: new Item('Satan',
             locs.hell,
             'Poke ',
             function () {
-                alert('"Ouch!"');
-                this.loc.interact();
+                ui.userInput(
+
+                    'Satan: "Ouch!"',
+                    function (userInput, loc) {
+                        loc.interact()
+                    },
+                    this.loc
+                );
             }
         ),
 
@@ -133,10 +204,24 @@ function play() {
             locs.kitchen,
             'Sit on ',
             function () {
-                do {
-                    alert('You sit on chair.');
-                } while (confirm('Keep sitting on chair?'));
-                this.loc.interact();
+                ui.userInput(
+                    'You sit on chair.',
+                    function (userInput, chair) {
+                        ui.userInput(
+                            'Keep sitting on chair?',
+                            function (userInput, chair) {
+                                if (userInput.toLowerCase() === 'no') {
+                                    chair.loc.interact();
+                                }
+                                else {
+                                    chair.interact();
+                                }
+                            },
+                            chair
+                        );
+                    },
+                    this
+                )
             }
         ),
 
