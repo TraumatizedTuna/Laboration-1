@@ -17,7 +17,7 @@ class Location {
         this.items.delete(item);
     }
     interact() {
-        alert(this.message);
+        ui.setLoc(this.message);
         let actions = {};
         let options = '';
         for (let loc of this.neighbors) {
@@ -30,12 +30,17 @@ class Location {
             actions[command.toLowerCase().replaceAll(' ', '')] = item;
             options += '\n' + command;
         }
-        let action;
-        while (!action) {
-            let userInput = prompt('Options:' + options);
-            action = actions[userInput.toLowerCase().replaceAll(' ', '')]
-        }
-        action.interact();
+
+
+        ui.userInput(
+            'Options:' + options,
+            function (userInput, actions) {
+                let action = actions[userInput.toLowerCase().replaceAll(' ', '')]
+                action.interact();
+            },
+            actions
+        );
+
     }
 }
 Location.connect = function (loc0, loc1) {
@@ -48,7 +53,15 @@ class Item {
         this.name = name;
         this.move(loc);
         this.command = command || 'Check out ';
-        this.interact = interact || function () { alert('This is ' + this.name); this.loc.interact() };
+        this.interact = interact || function () {
+            ui.userInput(
+                'This is ' + this.name,
+                function(userInput, loc){
+                    loc.interact()
+                },
+                this.loc
+            )
+        };
     }
     move(destination) {
         if (this.loc) {
