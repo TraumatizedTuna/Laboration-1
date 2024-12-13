@@ -105,7 +105,7 @@ function play() {
                     function (userInput, bob) {
 
                         let talkToBob = function (name, bob, talkToBob) {
-                            name.replace(' ', '').toLowerCase();
+                            name = name.replace(' ', '').toLowerCase();
                             if (name) {
                                 //You have to be more creative than that
                                 if (name === 'bob') {
@@ -138,14 +138,14 @@ function play() {
                                 //If it isn't you'll have to try harder
                                 else {
                                     ui.userInput(
-                                        "Bob: That's not a palindrome though.",
+                                        'Bob: "That\'s not a palindrome though."',
                                         function (userInput, bob) {
                                             //One in five risk that Bob dies
                                             if (Math.random() < .2) {
                                                 let loc = bob.loc;
                                                 //Bob doesn't seem like a nice guy
                                                 bob.move(locs.hell);
-                                                userInput('Bob was killed by the non-palindromity of your name.',
+                                                ui.userInput('Bob was killed by the non-palindromity of your name.',
                                                 function(userInput, loc){
                                                     loc.interact();
                                                 },
